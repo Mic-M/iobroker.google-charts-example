@@ -6,7 +6,7 @@
  * ----------------------------------------------------
  * Autor: Mic (ioBroker-Forum) / Mic-M (Github)
  * Quelle: https://github.com/Mic-M/iobroker.google-charts-example/
- * Support:
+ * Support: https://forum.iobroker.net/topic/22779/vorlage-google-charts-beispiel
  ******************************************************************************/
 
 
@@ -21,12 +21,6 @@ const FILE_PATH = '/opt/iobroker/iobroker-data/files/vis.0/M3/googleChartWeather
 
 // Schedule
 const M_SCHEDULE = '5 1 * * *'; // Um 1:05 Uhr jeden Tag
-
-
-/*******************************************************************************
- * Ab hier nichts mehr ändern / Stop editing here!
- ******************************************************************************/
-
 
 
 /*******************************************************************************
