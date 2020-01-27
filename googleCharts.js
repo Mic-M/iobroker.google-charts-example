@@ -1,12 +1,13 @@
-/*******************************************************************************
-  * Script, um mittels Google Charts einen Wetter-Graph anzuzeigen
-  * ----------------------------------------------------
+/****************************************************************************************************
+ * Script, um mittels Google Charts einen Wetter-Graph anzuzeigen
+ * --------------------------------------------------------------------------------------------------
+ * Aktuelle Version: https://github.com/Mic-M/iobroker.google-charts-example/
+ * Support:          https://forum.iobroker.net/topic/22779/vorlage-google-charts-beispiel
+ * Autor:            Mic (ioBroker-Forum) / Mic-M (Github)
+ * --------------------------------------------------------------------------------------------------
  * Change Log:
+ *  0.2 Mic + Fix/improve file creation.
  *  0.1 Mic - Initial Release
- * ----------------------------------------------------
- * Autor: Mic (ioBroker-Forum) / Mic-M (Github)
- * Quelle: https://github.com/Mic-M/iobroker.google-charts-example/
- * Support: https://forum.iobroker.net/topic/22779/vorlage-google-charts-beispiel
  ******************************************************************************/
 
 
@@ -15,37 +16,66 @@
  ******************************************************************************/
 
 // Der Pfad der HTML-Datei, einfach entsprechend anpassen.
-// In VIS dann etwa folgenden Pfad im iFrame-Widget einfügen: '/vis.0/M3/googleChartWeatherGraph.html', 
-// also nur den hinteren Abschnitt ab '/vis.....'
-const FILE_PATH = '/opt/iobroker/iobroker-data/files/vis.0/M3/googleChartWeatherGraph.html';
+// Die Datei wird abgelegt unterhalb von '/opt/iobroker/iobroker-data/files/vis.0/'
+const FILE_PATH = 'M3/googleChartWeatherGraph.html';
 
 // Schedule
 const M_SCHEDULE = '5 1 * * *'; // Um 1:05 Uhr jeden Tag
+
+// Ausgaben für Debug
+const LOG_DEBUG = false;
+
+/*******************************************************************************
+ * Global constants/variables
+ *******************************************************************************/
+let mSchedule; // for the schedule
 
 
 /*******************************************************************************
  * Executed on every script start.
  *******************************************************************************/
-let mSchedule;
 main();
 function main() {
     
     // Write the file initially on script start
-    writeWeatherHtml();
-
-    // Update file per schedule
-    clearSchedule(mSchedule);
-    mSchedule = schedule(M_SCHEDULE, writeWeatherHtml);
+    writeGoogleHtml(function(success) {
+        if (LOG_DEBUG) log('[Debug] We are now in the callback of writeWeatherHtml().');
+        if (success) {
+            if (LOG_DEBUG) log('[Debug] Successfully executed writeWeatherHtml(), so we schedule the updates.');
+            clearSchedule(mSchedule);
+            mSchedule = schedule(M_SCHEDULE, writeGoogleHtml);
+        } else {
+            log('File not successfully created/updated, so we stop at this point.', 'error');
+        }
+    });
 
 }
 
-function writeWeatherHtml() {
-    // Requiring fs module in which writeFile function is defined. 
-    const fs = require('fs');
-    // Write data in 'Output.txt' . 
-    fs.writeFile(FILE_PATH, buildHTML(), (err) => { 
-        if (err) throw err; // In case of a error throw err. 
+/**
+ * Writing Google html file.
+ * @param {object} [callback]   Optional: A callback function which is executed after proceeding this function.
+ */
+function writeGoogleHtml(callback = undefined) {
+    let result = writeFile('vis.0', FILE_PATH, buildHTML(), function (error) {
+        if (error) {
+            log('[Error] Error while executing writeFile(): ' + error);
+            if (typeof callback === 'function') { // execute if a function was provided to parameter callback
+                if (LOG_DEBUG) log('[Debug] Function to callback parameter was provided');
+                return callback(false);
+            } else {
+                return;
+            }
+        } else {
+            if (LOG_DEBUG) log('[Debug] File successfully written: [' + FILE_PATH + ']');
+            if (typeof callback === 'function') { // execute if a function was provided to parameter callback
+                if (LOG_DEBUG) log('[Debug] Function to callback parameter was provided');
+                return callback(true);
+            } else {
+                return;
+            }
+        }
     }) 
+    return result;
 }
 
 function buildHTML() {
@@ -85,4 +115,5 @@ function buildHTML() {
     html += '</html>\n';
     return html;
 }
+
 
