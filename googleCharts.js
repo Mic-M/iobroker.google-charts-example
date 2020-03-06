@@ -6,6 +6,7 @@
  * Autor:            Mic (ioBroker-Forum) / Mic-M (Github)
  * --------------------------------------------------------------------------------------------------
  * Change Log:
+ *  0.3 Mic * Added line color - https://forum.iobroker.net/post/389919
  *  0.2 Mic + Fix/improve file creation.
  *  0.1 Mic - Initial Release
  ******************************************************************************/
@@ -101,6 +102,8 @@ function buildHTML() {
     }
     // See: https://developers.google.com/chart/interactive/docs/gallery/linechart#configuration-options
     html += "var options = {\n";
+    // Line colors (HTML): lower    upper
+    html += "    colors: ['blue', 'red'],\n";
     html += "    curveType: 'function', backgroundColor: 'transparent', pointSize: 4,\n";
     html += "    hAxis: {textStyle:{color:'white'}},\n";
     html += "    vAxis: { textPosition: 'none', textStyle:{color:'red'},\n";
